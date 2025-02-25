@@ -43,17 +43,22 @@ export class AuthService {
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials');
     }
-
+console.log(1231232344)
+    
+console.log(this.generateToken(user))
     return this.generateToken(user);
   }
 
   private generateToken(user: User): { access_token: string } {
+    console.log("user generzsdgzsd",user)
+    
     const payload = {
       email: user.email,
       sub: user.id,
       role: user.role,
-      exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 30, // 30 days expiration
+      //exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 30, // 30 days expiration
     };
+    console.log("payload",payload)
     return {
       access_token: this.jwtService.sign(payload),
     };
