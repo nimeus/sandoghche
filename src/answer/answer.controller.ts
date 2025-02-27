@@ -18,6 +18,27 @@ export class AnswerController {
     return this.answerService.create(createAnswerDto);
   }
 
+  @Post('batch')
+  @ApiOperation({ summary: 'Create multiple new answers' })
+  @ApiResponse({ 
+    status: 201, 
+    description: 'Answers successfully created', 
+    type: [Answer] 
+  })
+  @ApiBody({ 
+    description: 'JSON string representing an array of CreateAnswerDto objects', 
+    type: String 
+  })
+  async createMultiple(
+    @Body() answersJson: string,
+  ): Promise<{ 
+    answers: Answer[], 
+    timings: { individual: number[], total: number } 
+  }> {
+    console.log(answersJson);
+    return this.answerService.createMultipleAnswers(answersJson);
+  }
+
   //@Get('questionnaire/:questionnaireId')
   //@ApiOperation({ summary: 'Get all answers for a specific questionnaire' })
   //@ApiResponse({ status: 200, description: 'List of answers', type: [Answer] })
