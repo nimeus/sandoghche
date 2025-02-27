@@ -16,7 +16,7 @@ export class OpenAIService {
     this.openai = new OpenAIApi({
       apiKey: process.env.OPEN_AI_SECRET_KEY,
     });
-    console.log(this.openai)
+    //console.log(this.openai)
   }
 
   /**
@@ -68,6 +68,82 @@ export class OpenAIService {
       throw new ServiceUnavailableException('Failed request to ChatGPT');
     }
   }
+
+  async chatGptRequestForAnalyzingAnswer(prompt: string): Promise<string> {
+    try {
+
+      const prePrompt = `Analyze the following survey comment and return only a JSON output. The input is:
+  - A \`comment\` (text field).
+  
+  Generate the following fields in the JSON output:
+  1. analyzed_ai_rating: A rating from 1-5 based solely on the AI's analysis of the comment (1 = very negative, 5 = very positive). Use sentiment and key themes in the comment to determine this.
+  2. short_summary: A concise summary of the comment (1-2 sentences). Focus on the main points and avoid minor details.
+  3. category: The most relevant category for the comment. Generate a category based on the content of the comment.
+  4. tags: Up to 3 relevant tags that describe the comment. Use specific and actionable phrases derived from the comment.
+  5. importance_index: A score from 1-10 indicating the importance or urgency of the comment. Use the following guidelines:
+     - 1-3: Low importance (e.g., general feedback, no urgency).
+     - 4-6: Moderate importance (e.g., minor issues, suggestions for improvement).
+     - 7-10: High importance (e.g., critical issues, complaints requiring immediate attention).
+  6. user_mood: A score from 1-10 guessing how the user feels (1 = bad, 10 = good). Use the following guidelines:
+     - 1-3: Bad mood (e.g., frustrated, angry, disappointed).
+     - 4-6: Neutral mood (e.g., indifferent, slightly dissatisfied).
+     - 7-10: Good mood (e.g., happy, satisfied, pleased).
+  7. needs_action: A boolean (true or false) indicating whether the comment requires any follow-up action. Use the following rules:
+     - true: If the comment contains complaints, critical issues, or urgent feedback.
+     - false: If the comment is positive, neutral, or does not require any action.
+  
+  If the comment is empty or nonsensical, return the empty JSON:
+  {
+    "analyzed_ai_rating": null,
+    "short_summary": "No valid comment provided.",
+    "category": null,
+    "tags": [],
+    "importance_index": null,
+    "user_mood": null,
+    "needs_action": false
+  }
+  
+  Return only the JSON output, formatted as follows:
+  {
+    "analyzed_ai_rating": 4,
+    "short_summary": "The customer was satisfied with the service but mentioned minor delays in delivery.",
+    "category": "Delivery",
+    "tags": ["fast service", "delayed delivery", "satisfied customer"],
+    "importance_index": 6,
+    "user_mood": 7,
+    "needs_action": true
+  }
+  
+  comment: `;
+  
+      // Make a request to the ChatGPT model
+      const completion: ChatCompletion = await this.openai.chat.completions.create({
+        model: 'gpt-4o-mini',
+        messages: [
+          {
+            role: 'system',
+            content: prePrompt + prompt,
+          },
+        ],
+        temperature: 0.5,
+        //max_tokens: 10000,
+      });
+  
+      // Extract the content from the response
+      const [content] = completion.choices.map((choice) => choice.message.content);
+  
+      if (content === null) {
+        throw new ServiceUnavailableException('Received null content from ChatGPT');
+      }
+  
+      return content;
+    } catch (e) {
+      // Log and propagate the error
+      console.error(e);
+      throw new ServiceUnavailableException('Failed request to ChatGPT');
+    }
+  }
+  
 
   /**
    * Transcribe audio from a buffer using the OpenAI Whisper model.

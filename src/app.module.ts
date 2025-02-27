@@ -11,6 +11,8 @@ import { Questionnaire } from './entities/questionnaire.entity';
 import { QuestionnaireModule } from './questionnaire/questionnaire.module';
 import { AnswerModule } from './answer/answer.module';
 import { Answer } from './entities/answer.entity';
+import { ReportsModule } from './reports/reports.module';
+import { BullModule } from '@nestjs/bull';
 
 
 @Module({
@@ -37,7 +39,9 @@ import { Answer } from './entities/answer.entity';
     UserModule,
     OpenAIModule,
     QuestionnaireModule,
-    AnswerModule
+    AnswerModule,
+    ReportsModule,
+    BullModule
   ],
   controllers: [AppController],
   providers: [AppService],

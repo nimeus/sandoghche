@@ -18,20 +18,20 @@ export class AnswerController {
     return this.answerService.create(createAnswerDto);
   }
 
-  @Get('questionnaire/:questionnaireId')
-  @ApiOperation({ summary: 'Get all answers for a specific questionnaire' })
-  @ApiResponse({ status: 200, description: 'List of answers', type: [Answer] })
-  @ApiParam({ name: 'questionnaireId', example: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', description: 'The questionnaire ID' })
-  async findByQuestionnaireId(@Param('questionnaireId') questionnaireId: string): Promise<Answer[]> {
-    return this.answerService.findByQuestionnaireId(questionnaireId);
-  }
-
-  @Get(':id')
-  @ApiOperation({ summary: 'Get an answer by ID' })
-  @ApiResponse({ status: 200, description: 'The answer details', type: Answer })
-  @ApiResponse({ status: 404, description: 'Answer not found' })
-  @ApiParam({ name: 'id', example: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', description: 'The answer ID' })
-  async findById(@Param('id') id: string): Promise<Answer | null> {
-    return this.answerService.findById(id);
-  }
+  //@Get('questionnaire/:questionnaireId')
+  //@ApiOperation({ summary: 'Get all answers for a specific questionnaire' })
+  //@ApiResponse({ status: 200, description: 'List of answers', type: [Answer] })
+  //@ApiParam({ name: 'questionnaireId', example: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', description: 'The questionnaire ID' })
+  //async findByQuestionnaireId(@Param('questionnaireId') questionnaireId: string): Promise<Answer[]> {
+  //  return this.answerService.findByQuestionnaireId(questionnaireId);
+  //}
+  //
+  //@Get(':id')
+  //@ApiOperation({ summary: 'Get an answer by ID' })
+  //@ApiResponse({ status: 200, description: 'The answer details', type: Answer })
+  //@ApiResponse({ status: 404, description: 'Answer not found' })
+  //@ApiParam({ name: 'id', example: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', description: 'The answer ID' })
+  //async findById(@Param('id') id: string): Promise<Answer | null> {
+  //  return this.answerService.findById(id);
+  //}
 }
