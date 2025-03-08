@@ -72,49 +72,64 @@ export class OpenAIService {
   async chatGptRequestForAnalyzingAnswer(prompt: string): Promise<string> {
     try {
 
-      const prePrompt = `Analyze the following survey comment and return only a JSON output. The input is:
-  - A \`comment\` (text field).
-  
-  Generate the following fields in the JSON output:
-  1. analyzed_ai_rating: A rating from 1-5 based solely on the AI's analysis of the comment (1 = very negative, 5 = very positive). Use sentiment and key themes in the comment to determine this.
-  2. short_summary: A concise summary of the comment (1-2 sentences). Focus on the main points and avoid minor details.
-  3. category: The most relevant category for the comment. Generate a category based on the content of the comment.
-  4. tags: Up to 3 relevant tags that describe the comment. Use specific and actionable phrases derived from the comment.
-  5. importance_index: A score from 1-10 indicating the importance or urgency of the comment. Use the following guidelines:
-     - 1-3: Low importance (e.g., general feedback, no urgency).
-     - 4-6: Moderate importance (e.g., minor issues, suggestions for improvement).
-     - 7-10: High importance (e.g., critical issues, complaints requiring immediate attention).
-  6. user_mood: A score from 1-10 guessing how the user feels (1 = bad, 10 = good). Use the following guidelines:
-     - 1-3: Bad mood (e.g., frustrated, angry, disappointed).
-     - 4-6: Neutral mood (e.g., indifferent, slightly dissatisfied).
-     - 7-10: Good mood (e.g., happy, satisfied, pleased).
-  7. needs_action: A boolean (true or false) indicating whether the comment requires any follow-up action. Use the following rules:
-     - true: If the comment contains complaints, critical issues, or urgent feedback.
-     - false: If the comment is positive, neutral, or does not require any action.
-  
-  If the comment is empty or nonsensical, return the empty JSON:
-  {
-    "analyzed_ai_rating": null,
-    "short_summary": "No valid comment provided.",
-    "category": null,
-    "tags": [],
-    "importance_index": null,
-    "user_mood": null,
-    "needs_action": false
-  }
-  
-  Return only the JSON output, formatted as follows:
-  {
-    "analyzed_ai_rating": 4,
-    "short_summary": "The customer was satisfied with the service but mentioned minor delays in delivery.",
-    "category": "Delivery",
-    "tags": ["fast service", "delayed delivery", "satisfied customer"],
-    "importance_index": 6,
-    "user_mood": 7,
-    "needs_action": true
-  }
-  
-  comment: `;
+      const prePrompt = `Analyze the following survey comment and return only a JSON output. The input is a single text field labeled as "comment".
+
+Generate the following fields in the JSON output:
+
+1. analyzed_ai_rating: A rating from 1 to 5 based solely on the AI's analysis of the comment (1 = very negative, 5 = very positive). Base this rating on overall sentiment and key themes in the comment.
+
+2. short_summary: A concise summary of the comment (1-2 sentences) that captures the main points while avoiding minor details.
+
+3. category: The most relevant category for the comment. Use a consistent set of categories across responses. If the comment does not clearly relate to an existing category, assign a new category (or use "General" if appropriate).
+
+4. tags: An array of up to 3 specific, actionable tags that describe the comment. Ensure consistency by using a predefined set of tags where possible; if the comment does not fit any existing tags, generate a new, descriptive tag (or use a default tag like "General").
+
+5. importance_index: A score from 1 to 10 indicating the importance or urgency of the comment. Consider both sentiment and any explicit urgency markers. Use the following guidelines:
+   - 1-3: Low importance (e.g., general feedback, no urgency).
+   - 4-6: Moderate importance (e.g., minor issues, suggestions for improvement).
+   - 7-10: High importance (e.g., critical issues, complaints requiring immediate attention).
+
+6. user_mood: A score from 1 to 10 estimating how the user feels (1 = very negative, 10 = very positive) based on sentiment and key phrases in the comment.
+
+7. needs_action: A boolean value (true or false) indicating whether the comment requires any follow-up action. Set to true if the comment includes complaints, critical issues, or urgent feedback; otherwise, set to false.
+
+8. action_steps: If needs_action is true, provide a short sentence summarizing the action steps that the client should take in response to the comment. If needs_action is false, return an empty string.
+
+9. pros: An array listing any positive aspects or strengths mentioned in the comment. If no positives are identified, return an empty array.
+
+10. cons: An array listing any negative aspects, issues, or concerns mentioned in the comment. If no negatives are identified, return an empty array.
+
+If the comment is empty, nonsensical, or does not provide valid feedback, return the following JSON exactly:
+
+{
+  "analyzed_ai_rating": null,
+  "short_summary": "No valid comment provided.",
+  "category": null,
+  "tags": [],
+  "importance_index": null,
+  "user_mood": null,
+  "needs_action": false,
+  "action_steps": "",
+  "pros": [],
+  "cons": []
+}
+
+Return only the JSON output, formatted exactly as follows:
+
+{
+  "analyzed_ai_rating": <number>,
+  "short_summary": <string>,
+  "category": <string>,
+  "tags": [<string>, ...],
+  "importance_index": <number>,
+  "user_mood": <number>,
+  "needs_action": <boolean>,
+  "action_steps": <string>,
+  "pros": [<string>, ...],
+  "cons": [<string>, ...]
+}
+
+comment: `;
   
       // Make a request to the ChatGPT model
       const completion: ChatCompletion = await this.openai.chat.completions.create({
