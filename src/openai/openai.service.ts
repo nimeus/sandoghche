@@ -12,7 +12,7 @@ type Message = {
 @Injectable()
 export class OpenAIService {
   public openai: OpenAIApi;
-  private languagePrompt = ' *FARSI or PERSIAN*';
+  private languagePrompt = ' *فارسی*';
 
   constructor() {
     this.openai = new OpenAIApi({
@@ -164,7 +164,7 @@ export class OpenAIService {
   For consistent categorization and tagging, carefully consider the previously used categories, tags, pros, and cons before creating new ones.
   
   IMPORTANT CONSISTENCY RULES:
-  - All generated text should be in ${this.languagePrompt}. DONT USE ANY THING ELSE.
+  - All generated text should be in ${this.languagePrompt} and DONT USE ANY THING ELSE.
   - Before creating a new category, tag, pro, or con, check if an existing one exactly matches the concept.
   - There is no need to use the exact words used in the comment anywhere, you can write better phrases.
   
@@ -196,7 +196,7 @@ export class OpenAIService {
     "cons": []
   }
   
-  Return only the JSON output formatted exactly as follows:
+  Return only the (JSON output) formatted exactly as follows:
   `;
 
       const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
@@ -208,7 +208,7 @@ export class OpenAIService {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          model: "google/gemini-2.0-flash-lite-preview-02-05:free",
+          model: "google/gemini-2.0-flash-lite-001",
           messages: [{
             role: "system",
             content: prePrompt + prompt,
