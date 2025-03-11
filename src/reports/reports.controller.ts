@@ -88,4 +88,11 @@ export class ReportsController {
   async getAnswerSummaryByQuestionnaire(@Param('questionnaireId', ParseUUIDPipe) questionnaireId: string) {
     return this.ReportService.getAnswerSummaryByQuestionnaire(questionnaireId);
   }
+
+  @Get('questionnaire/:questionnaireId/QuestionnaireAiReport')
+  @ApiOperation({ summary: 'Get summary statistics for questionnaire by questionnaire ID' })
+  @ApiParam({ name: 'questionnaireId', description: 'Questionnaire UUID' }) 
+  async questionnaireAiReport(@Param('questionnaireId', ParseUUIDPipe) questionnaireId: string) {
+    return this.ReportService.getQuestionnaireAiReport(questionnaireId);
+  } 
 }

@@ -13,6 +13,7 @@ import { AnswerModule } from './answer/answer.module';
 import { Answer } from './entities/answer.entity';
 import { ReportsModule } from './reports/reports.module';
 import { BullModule } from '@nestjs/bull';
+import { AIGeneratedReport } from './entities/aiGeneratedReport.entity';
 
 
 @Module({
@@ -30,7 +31,7 @@ import { BullModule } from '@nestjs/bull';
         },
         autoLoadEntities: true,
         synchronize: true, // Set to false in production
-        entities: [User,Questionnaire,Answer],
+        entities: [User,Questionnaire,Answer,AIGeneratedReport],
         uuidExtension: 'uuid-ossp',
       }),
       inject: [ConfigService],

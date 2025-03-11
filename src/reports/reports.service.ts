@@ -3,12 +3,16 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Not, IsNull, Brackets } from 'typeorm';
 import { Answer } from '../entities/answer.entity';
 import { QuestionnaireAnswersQueryDto } from 'src/dto/questionnaire-answers-query.dto';
+import { AIGeneratedReport } from 'src/entities/aiGeneratedReport.entity';
 
 @Injectable()
 export class ReportService {
   constructor(
     @InjectRepository(Answer)
     private answersRepository: Repository<Answer>,
+
+    @InjectRepository(AIGeneratedReport)
+    private aiGeneratedReportRepository: Repository<AIGeneratedReport>,
   ) {}
 
   async getAnswersByQuestionnaireId(
@@ -335,5 +339,10 @@ async getCategoriesByQuestionnaireId(questionnaireId: string): Promise<string[]>
       actionRequiredCount,
       categoryDistribution,
     };
+  }
+
+  async getQuestionnaireAiReport(questionnaireId: string) {
+    // Get total count of answers
+    return await this.aiGeneratedReportRepository.findOne({ where: { questionnaireId } });
   }
 }

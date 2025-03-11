@@ -3,6 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { ResponseDto } from '../dto/response.dto';
 import { UserInfoDto } from '../dto/user-info.dto';
 import { AIReportDto } from '../dto/ai-report.dto';
+import { IsBoolean, IsOptional } from 'class-validator';
 
 @Entity('answers')
 export class Answer {
@@ -34,6 +35,11 @@ export class Answer {
   @UpdateDateColumn()
   updatedAt: Date;
 
+  @ApiProperty({ example: false, description: 'Indicates if the answer has been analyzed' })
+  @IsBoolean()
+  @IsOptional()
+  @Column({ default: null })
+  isAnalyzed?: boolean; // Changed to camelCase
   //@ManyToOne(() => Questionnaire, questionnaire => questionnaire.answers, { onDelete: 'CASCADE' })
   //questionnaire: Questionnaire;
 }

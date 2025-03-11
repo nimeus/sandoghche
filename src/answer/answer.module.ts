@@ -6,11 +6,12 @@ import { AnswerController } from './answer.controller';
 import { OpenAIService } from 'src/openai/openai.service';
 import { BullModule } from '@nestjs/bull';
 import { AnswerProcessor } from 'src/processors/answer.processor';
+import { AIGeneratedReport } from 'src/entities/aiGeneratedReport.entity';
 
 @Module({
   controllers: [AnswerController],
   imports: [
-    TypeOrmModule.forFeature([Answer]),
+    TypeOrmModule.forFeature([Answer,AIGeneratedReport]),
     BullModule.forRoot({
       redis: {
         host: 'redis://:yw53Pi1BBBWf548sqbiGSG79@ilhuilhuilhui:6379/0',        

@@ -13,14 +13,14 @@ export class AnswerProcessor {
     private openAIService: OpenAIService,
   ) {}
 
-  @Process('generate-ai-report')
-  async handleGenerateAiReport(job: Job<{ answerId: string; comment: string }>) {
-    console.log('Generating AI report for answer:', job.data);
-    const { answerId, comment } = job.data;
-    const aiReport = await this.openAIService.chatGptRequestForAnalyzingAnswer(comment);
-
-    await this.answerRepository.update(answerId, {
-      aiReport: JSON.parse(aiReport),
-    });
-  }
+  //@Process('generate-ai-report')
+  //async handleGenerateAiReport(job: Job<{ answerId: string; comment: string }>) {
+  //  console.log('Generating AI report for answer:', job.data);
+  //  const { answerId, comment } = job.data;
+  //  const aiReport = await this.openAIService.chatGptRequestForAnalyzingAnswer(comment);
+  //
+  //  await this.answerRepository.update(answerId, {
+  //    aiReport: JSON.parse(aiReport),
+  //  });
+  //}
 }
