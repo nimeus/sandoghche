@@ -14,6 +14,8 @@ import { Answer } from './entities/answer.entity';
 import { ReportsModule } from './reports/reports.module';
 import { BullModule } from '@nestjs/bull';
 import { AIGeneratedReport } from './entities/aiGeneratedReport.entity';
+import { ExternalCommentsModule } from './external-comments/external-comments.module';
+import { ExternalComment } from './entities/externalComment.entity';
 
 
 @Module({
@@ -31,7 +33,7 @@ import { AIGeneratedReport } from './entities/aiGeneratedReport.entity';
         },
         autoLoadEntities: true,
         synchronize: true, // Set to false in production
-        entities: [User,Questionnaire,Answer,AIGeneratedReport],
+        entities: [User,Questionnaire,Answer,AIGeneratedReport,ExternalComment],
         uuidExtension: 'uuid-ossp',
       }),
       inject: [ConfigService],
@@ -42,7 +44,8 @@ import { AIGeneratedReport } from './entities/aiGeneratedReport.entity';
     QuestionnaireModule,
     AnswerModule,
     ReportsModule,
-    BullModule
+    BullModule,
+    ExternalCommentsModule
   ],
   controllers: [AppController],
   providers: [AppService],

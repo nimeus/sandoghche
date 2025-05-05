@@ -244,7 +244,7 @@ export class OpenAIService {
     throw new Error("Invalid JSON format");
   }
 
-  public async generateBatchReportFromAI(
+  public async generateBatchReportFromAI_d(
     existingData: BatchReportData,
     newAnswers: { response: string; aiReport: AIReportDto }[]
   ): Promise<string> {
@@ -306,6 +306,87 @@ export class OpenAIService {
     if (!content) {
       throw new Error("No content returned from AI");
     }
+    return content;
+  }
+  
+  public async generateBatchReportFromAI(
+    existingData: BatchReportData,
+    newAnswers: { response: string; aiReport: AIReportDto }[]
+  ): Promise<string> {
+  
+    console.log("batch :",existingData,newAnswers);
+  
+    if (newAnswers.length !== 10) {
+      throw new Error("Exactly 10 new answers are required.");
+    }
+  
+    const prePrompt = `
+  You are an AI updating a JSON survey report. You will receive:
+  1. An existing report (JSON) with prior aggregated data.
+  2. An array of exactly 10 new survey answers. Each answer has:
+     - "response": user comment.
+     - "aiReport": including fields such as analyzed_ai_rating, user_mood, importance (1-10), categories, tags, needs_action, pros, and cons.
+  Tasks:
+  - Merge the 10 new answers with the existing report.
+  - Increment "totalAnswers" by 10 (counting all, even with null values).
+  - Recalculate "averageAIRating" and "averageUserMood" using only valid (non-null) values.
+  - Update "importanceDistribution" by grouping "importance" into "1-3", "4-6", and "7-10".
+  - Aggregate counts for "categories" and "tags".
+  - Update "needsActionCount", "prosCount", and "consCount".
+  - Update "summaryStats" with counts for totalPros, totalCons, and actionStepsRequired.
+  - Generate summary: use previous summary and merge to generate useful text that considers all aspects and gives good suggestions for improvement, should comment on the most important issues and talk about the statistics and information available. summary should be vey complete and not a short text.
+  - summary should be well formatted because i want to show it directly to user.
+  - IMPORTANT: All generated text should be in ${this.languagePrompt}.
+  Return ONLY the updated JSON report exactly matching this structure:
+  
+  {
+    "questionnaireId": <string>,
+    "totalAnswers": <number>,
+    "averageAIRating": <number>,
+    "averageUserMood": <number>,
+    "importanceDistribution": { "1-3": <number>, "4-6": <number>, "7-10": <number> },
+    "categories": { <string>: <number> },
+    "tags": { <string>: <number> },
+    "needsActionCount": <number>,
+    "prosCount": <number>,
+    "consCount": <number>,
+    "summary": <string>,
+    "summaryStats": { "totalPros": { <string>: <number> }, "totalCons": { <string>: <number> }, "actionStepsRequired": <number> }
+  }
+  
+  Do not include any extra text.
+  
+  Existing report:
+  ${JSON.stringify(existingData, null, 2)}
+  
+  New answers (10):
+  ${JSON.stringify(newAnswers, null, 2)}
+  `;
+  
+  const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
+      //"HTTP-Referer": "<YOUR_SITE_URL>",
+      //"X-Title": "<YOUR_SITE_NAME>",
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      model: "google/gemini-2.0-flash-lite-001",
+      messages: [{
+        role: "system",
+        content: prePrompt,
+      }],
+      temperature: 0.5,
+    })
+  });
+
+  if (!response.ok) {
+    throw new ServiceUnavailableException(`Failed request to OpenRouter: ${response.statusText}`);
+  }
+  const data = await response.json();
+  console.log(data.choices?.[0]?.message)
+  const content = this.extractJson(data.choices?.[0]?.message?.content);
     return content;
   }
   

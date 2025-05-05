@@ -1,5 +1,5 @@
-import { Controller, Post, Get, Body, Param } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody } from '@nestjs/swagger';
+import { Controller, Post, Get, Body, Param, Query } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody, ApiQuery } from '@nestjs/swagger';
 import { AnswerService } from './answer.service';
 import { CreateAnswerDto } from '../dto/create-answer.dto';
 import { Answer } from '../entities/answer.entity';
@@ -55,4 +55,60 @@ export class AnswerController {
   //async findById(@Param('id') id: string): Promise<Answer | null> {
   //  return this.answerService.findById(id);
   //}
+
+   /**
+   * Endpoint to retrieve external comments (from ExternalComment table) with AI reports.
+   * Query Parameter:
+   *   - questionnaireId: The ID used to filter external comments.
+   */
+   @ApiOperation({ summary: 'Retrieve external comments with AI reports' })
+   @ApiQuery({
+     name: 'questionnaireId',
+     description: 'The questionnaire ID used to filter external comments',
+     required: true,
+     type: String,
+   })
+   @ApiResponse({
+     status: 200,
+     description: 'External comments with AI reports successfully retrieved',
+     schema: {
+       example: {
+         status: true,
+         data: [
+           {
+             commentId: 12345,
+             questionnaireId: 'abc123-uuid',
+             externalServiceName: 'ExternalServiceX',
+             isImported: false,
+             createdAt: '2024-04-01T12:00:00.000Z',
+             updatedAt: '2024-04-01T12:00:00.000Z',
+             commentPayload: {
+               createdDate: '2024-04-01',
+               sender: 'John Doe',
+               commentText: 'This is a comment.',
+               rating: 5,
+               feeling: 'happy',
+               expeditionType: 'PICKUP',
+               foods: []
+             },
+             aiReport: {
+               summary: 'AI generated summary for the comment',
+               sentiment: 'positive'
+               // additional AI report fields...
+             }
+           }
+         ]
+       }
+     }
+   })
+   @Get('external-comments')
+   async importExternalCommentsAsAnswers(
+     @Query('questionnaireId') questionnaireId: string,
+   ) {
+     const result = await this.answerService.importExternalCommentsAsAnswers(questionnaireId);
+     return {
+       status: true,
+       data: result,
+     };
+   }
 }
